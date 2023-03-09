@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-import more_itertools
-import pandas as pd
 import requests
+import pandas as pd
 import seaborn as sns
+import more_itertools
 
 from tqdm import tqdm
 from taxonomy import Taxonomy
@@ -40,9 +40,9 @@ class DatasetHVI(ABC):
         """
         if file_path:
             self.file_path = file_path
-            self.data_frame: pd.Dataframe = pd.read_csv(file_path, sep=self.delimiter, header=self.header)
+            self.data_frame: pd.DataFrame = pd.read_csv(file_path, sep=self.delimiter, header=self.header)
         elif data_frame is not None:
-            self.data_frame: pd.Dataframe = data_frame
+            self.data_frame: pd.DataFrame = data_frame
         else:
             raise Exception("No data source given!")
 
