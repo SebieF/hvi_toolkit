@@ -199,6 +199,9 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         hvi_std = DatasetHVIStandardized(data_frame=merged_dataset, name=new_name)
         return hvi_std
 
+    def store(self, file_path: str):
+        self.data_frame.to_csv(file_path, header=True, index=False)
+
     def to_standardized_dataset(self, taxonomy: Taxonomy):
         return self
 
