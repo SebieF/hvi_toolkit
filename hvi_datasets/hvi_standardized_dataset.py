@@ -256,7 +256,7 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         unique_ids = list(set(uniprot_ids))
         return unique_ids
 
-    def download_from_uniprot(self) -> str:
+    def download_sequences_from_uniprot(self) -> str:
         """
         Download sequences for all unique proteins in the dataset and store them in fasta format.
         As post-translational modifications (PTMs) have to be taken into account,

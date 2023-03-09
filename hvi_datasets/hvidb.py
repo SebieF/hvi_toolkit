@@ -58,7 +58,7 @@ class DatasetHVIDB(DatasetHVI):
     def get_interactions_by_condition(self, category: str, condition: str) -> DatasetHVI:
         return DatasetHVIDB(data_frame=self.data_frame[self.data_frame[category].isin([condition])])
 
-    def download_from_uniprot(self):
+    def download_sequences_from_uniprot(self):
         pass
 
     def to_standardized_dataset(self, taxonomy: Taxonomy) -> DatasetHVIStandardized:

@@ -238,7 +238,7 @@ class DatasetHVI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_from_uniprot(self) -> str:
+    def download_sequences_from_uniprot(self) -> str:
         """
         Abstract method to download sequence data from UniProt.
 
