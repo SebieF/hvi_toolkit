@@ -100,9 +100,9 @@ class DatasetMITAB25(DatasetHVI):
         >>>mitab_std = mitab.to_standardized_dataset(taxonomy=taxonomy)
         >>>mitab_std_rhab = mitab_std.get_rhabdoviridae_associated_interactions()
 
-        :raise: NotImplementedError
+        :raise: ValueError
         """
-        raise NotImplementedError
+        raise ValueError
 
     def get_coronaviridae_associated_interactions(self):
         """
@@ -115,12 +115,9 @@ class DatasetMITAB25(DatasetHVI):
         >>>mitab_std = mitab.to_standardized_dataset(taxonomy=taxonomy)
         >>>mitab_std_coro = mitab_std.get_coronaviridae_associated_interactions()
 
-        :raise: NotImplementedError
+        :raise: ValueError
         """
-        raise NotImplementedError
-
-    def download_sequences_from_uniprot(self):
-        raise NotImplementedError
+        raise ValueError
 
     def to_standardized_dataset(self, taxonomy: Taxonomy):
         human_ids = ["9606", "9606(human)9606(Homo sapiens)", "9606(human)"]

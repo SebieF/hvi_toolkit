@@ -55,9 +55,6 @@ class DatasetHVIDB(DatasetHVI):
     def get_coronaviridae_associated_interactions(self):
         return DatasetHVIDB(data_frame=self.data_frame[self.data_frame["Viral_family"].isin(["Coronaviridae"])])
 
-    def download_sequences_from_uniprot(self):
-        pass
-
     def to_standardized_dataset(self, taxonomy: Taxonomy) -> DatasetHVIStandardized:
         series_protein_human = self.data_frame["Uniprot_human"].values
         series_protein_virus = self.data_frame["Uniprot_virus"].values

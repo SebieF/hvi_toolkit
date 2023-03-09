@@ -237,16 +237,6 @@ class DatasetHVI(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_sequences_from_uniprot(self) -> str:
-        """
-        Abstract method to download sequence data from UniProt.
-
-        :raises: NotImplementedError
-        :rtype: str
-        """
-        raise NotImplementedError
-
-    @abstractmethod
     def to_standardized_dataset(self, taxonomy: Taxonomy):
         """
         Abstract method to convert the dataset to a standardized format.

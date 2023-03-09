@@ -54,9 +54,6 @@ class DatasetVirusMentha(DatasetHVI):
         family_b = self.data_frame[self.data_frame["Family B"].isin([11118])]
         return DatasetVirusMentha(data_frame=pd.concat([family_a, family_b], ignore_index=True))
 
-    def download_sequences_from_uniprot(self):
-        raise NotImplementedError
-
     def to_standardized_dataset(self, taxonomy: Taxonomy) -> DatasetHVIStandardized:
         human_hosts_a = self.data_frame[self.data_frame["Family A"].isin([9606])]
         human_hosts_b = self.data_frame[self.data_frame["Family B"].isin([9606])]
