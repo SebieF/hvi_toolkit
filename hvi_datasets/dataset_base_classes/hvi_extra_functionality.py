@@ -114,7 +114,13 @@ class DatasetHVIStdExtraFunctionality:
 
         standardized_dataset_dropped = self.__class__(data_frame=dropped_df)
 
-        return DatasetHVIStdExtraFunctionality(data_frame=self.data_frame)
+        unique_ids_dropped = standardized_dataset_dropped.get_unique_proteins()
+        fasta_file_string_dropped = ""
+        for seq_id in unique_ids_dropped:
+            fasta_file_string_dropped += f">{seq_id}\n"
+            fasta_file_string_dropped += f"{ids_to_sequence[seq_id]}\n"
+
+        return fasta_file_string_dropped, standardized_dataset_dropped
 
     def _calculate_interaction_values_by_heuristic(self, interactor_id_list: List[str]) -> List[Tuple[str, int]]:
         """
