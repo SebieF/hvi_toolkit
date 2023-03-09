@@ -88,7 +88,7 @@ class DatasetHVI(ABC):
         counts.plot(kind="bar", title=title, color=sns.color_palette())
 
     @staticmethod
-    def __get_sequences_with_ptm_information(uniprot_list: List[str]) -> Dict[str, str]:
+    def _get_sequences_with_ptm_information(uniprot_list: List[str]) -> Dict[str, str]:
         """
         Retrieve protein sequences and associated post-translational modification (PTM) information from UniProtKB
         for a list of UniProtKB accession IDs.

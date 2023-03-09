@@ -268,8 +268,8 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         unique_ids = self.get_unique_proteins()
 
         print(f"Downloading {len(unique_ids)} protein sequences!")
-        sequence_dict = self.__get_sequences_with_ptm_information(uniprot_list=unique_ids)
-        fasta_file_path = f"downloaded_dataset_{self.name}.fasta"
+        sequence_dict = self._get_sequences_with_ptm_information(uniprot_list=unique_ids)
+        fasta_file_path = f"downloaded_dataset_{self.name.replace('standardized:', '')}.fasta"
         with open(fasta_file_path, "w") as fasta_file:
             for key, val in sequence_dict.items():
                 fasta_file.write(f">{key}\n")
