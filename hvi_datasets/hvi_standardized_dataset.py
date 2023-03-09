@@ -81,7 +81,8 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
                 drop_human_human.append(idx)
 
         if len(drop_human_human) > 0:
-            self.data_frame.drop(drop_human_human, inplace=True).reset_index(drop=True, inplace=True)
+            self.data_frame.drop(drop_human_human, inplace=True)
+            self.data_frame.reset_index(drop=True, inplace=True)
             print(f"Dropped {len(drop_human_human)} human-human interactions from {self.name}! "
                   f"Ids[0-5]: {drop_human_human[:5]}")
 
@@ -97,10 +98,10 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         # Create a dictionary to map uniprot_human-uniprot_virus pairs to interaction indexes (human&virus)
         mapping = {}
         for idx, uniprot_human in enumerate(self.data_frame["Uniprot_human"].values):
-            mapping[uniprot_human + "&" + self.data_frame["Uniprot_virus"].iloc[idx]] = []
+            mapping[uniprot_human + self.INTERACTION_INDICATOR + self.data_frame["Uniprot_virus"].iloc[idx]] = []
 
         for idx, uniprot_human in enumerate(self.data_frame["Uniprot_human"].values):
-            mapping[uniprot_human + "&" + self.data_frame["Uniprot_virus"].iloc[idx]].append(idx)
+            mapping[uniprot_human + self.INTERACTION_INDICATOR + self.data_frame["Uniprot_virus"].iloc[idx]].append(idx)
 
         duplicates = []
         for interaction_key, indexes in mapping.items():
@@ -125,8 +126,8 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
                 # Experimental: keep == True or remove == True
                 self.data_frame["Experimental"].iloc[keep] = str(bool(self.data_frame["Experimental"].iloc[keep]) or
                                                                  bool(self.data_frame["Experimental"].iloc[remove]))
-            self.data_frame.drop([remove for _, remove in duplicates], inplace=True).reset_index(drop=True,
-                                                                                                 inplace=True)
+            self.data_frame.drop([remove for _, remove in duplicates], inplace=True)
+            self.data_frame.reset_index(drop=True, inplace=True)
             print(f"Dropped {len(duplicates)} duplicated interactions from {self.name}! "
                   f"Ids[0-5]: {duplicates[:5]}")
 
