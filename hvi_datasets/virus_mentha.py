@@ -13,7 +13,7 @@ class DatasetVirusMentha(DatasetHVI):
     (Calderone et al. 2014, https://doi.org/10.1093/nar/gku830)
 
     URL: https://virusmentha.uniroma2.it/download.php
-    Included by HVIDB
+    Mostly included by HVIDB
 
     Fields from CSV:
         Protein A: Uniprot ID of Protein
