@@ -54,9 +54,6 @@ class DatasetVirusMentha(DatasetHVI):
         family_b = self.data_frame[self.data_frame["Family B"].isin([11118])]
         return DatasetVirusMentha(data_frame=pd.concat([family_a, family_b], ignore_index=True))
 
-    def get_interactions_by_condition(self, category: str, condition: str) -> DatasetVirusMentha:
-        return DatasetVirusMentha(data_frame=self.data_frame[self.data_frame[category].isin([condition])])
-
     def download_sequences_from_uniprot(self):
         raise NotImplementedError
 

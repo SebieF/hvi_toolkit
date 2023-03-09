@@ -55,9 +55,6 @@ class DatasetHVIDB(DatasetHVI):
     def get_coronaviridae_associated_interactions(self):
         return DatasetHVIDB(data_frame=self.data_frame[self.data_frame["Viral_family"].isin(["Coronaviridae"])])
 
-    def get_interactions_by_condition(self, category: str, condition: str) -> DatasetHVI:
-        return DatasetHVIDB(data_frame=self.data_frame[self.data_frame[category].isin([condition])])
-
     def download_sequences_from_uniprot(self):
         pass
 

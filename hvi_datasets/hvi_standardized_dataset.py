@@ -224,10 +224,6 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         return DatasetHVIStandardized(
             data_frame=self.data_frame[self.data_frame["Family_virus"].isin(["Coronaviridae"])])
 
-    def get_interactions_by_condition(self, category: str, condition: str) -> DatasetHVIStandardized:
-        return DatasetHVIStandardized(
-            data_frame=self.data_frame[self.data_frame[category].isin([condition])])
-
     def get_interaction_ids(self, bi_directional: bool = False) -> List[str]:
         """
         Return all interactions in the dataset as a list of interaction ids.

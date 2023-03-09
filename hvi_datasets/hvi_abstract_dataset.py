@@ -182,6 +182,20 @@ class DatasetHVI(ABC):
 
         return result_dict
 
+    def get_interactions_by_condition(self, category: str, condition: str) -> DatasetHVI:
+        """
+        Method to get all interactions that satisfy a certain condition regarding the given category
+
+        Example: get_interactions_by_condition(category="Family_virus", condition="Coronaviridae")
+
+        :param category: Category to apply the condition in the data_frame
+        :param condition: Condition that must be met as a string
+
+        :return: Dataset of same type with only interactions that meet the provided condition
+        :rtype: DatasetHVI
+        """
+        return self.__class__(data_frame=self.data_frame[self.data_frame[category].isin([condition])])
+
     @abstractmethod
     def get_lyssa_associated_interactions(self) -> DatasetHVI:
         """
@@ -216,21 +230,6 @@ class DatasetHVI(ABC):
     def get_coronaviridae_associated_interactions(self) -> DatasetHVI:
         """
         Abstract method to get interactions associated with coronaviridae viruses.
-
-        :raises: NotImplementedError
-        :rtype: DatasetHVI
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_interactions_by_condition(self, category: str, condition: str) -> DatasetHVI:
-        """
-        Abstract method to get all interactions that satisfy a certain condition regarding the given category
-
-        Example: get_interactions_by_condition(category="Family_virus", condition="Coronaviridae")
-
-        :param category: Category to apply the condition in the data_frame
-        :param condition: Condition that must be met as a string
 
         :raises: NotImplementedError
         :rtype: DatasetHVI
