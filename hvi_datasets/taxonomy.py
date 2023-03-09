@@ -26,7 +26,7 @@ class Taxonomy:
         self._id_to_family = {}
 
         # Read relevant entries from HVIDB
-        hvidb_path = "raw_data/HVIDB_PPIs.txt"
+        hvidb_path = "raw_data/hvidb/HVIDB_PPIs.txt"
         with open(hvidb_path, "r") as hvidb_file:
             lines = hvidb_file.readlines()
             for line in lines:
@@ -34,7 +34,7 @@ class Taxonomy:
                 self._id_to_name[values[7]] = values[16]
 
         # For rest use ncbi
-        ncbi_taxonomy_path = "raw_data/names_taxonomy.tsv"
+        ncbi_taxonomy_path = "raw_data/taxonomy/names_taxonomy.tsv"
         with open(ncbi_taxonomy_path, "r") as ncbi_taxonomy_file:
             lines = ncbi_taxonomy_file.readlines()
             for line in lines:
