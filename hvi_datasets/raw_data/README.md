@@ -1,6 +1,6 @@
 # Raw data sources
 
-## Datasets
+## Positive Datasets
 
 All data sources (besides *viruses_string*, see below) are included as a `.zip` file in the respective directories.
 
@@ -75,6 +75,21 @@ URL: http://viruses.string-db.org/download/protein.links.detailed.v10.5/9606.pro
 **ID Mapping:** `viruses_string_id_mapping.zip`
 
 Contains the non-uniprot-id identifiers from the Viruses.STRING dataset and the respective mappings (if available)
+
+## Negative datasets
+
+### Tsukiyama
+
+`tsukiyama_negatives.zip` 
+
+Negative dataset from LSTM-PHV: prediction of human-virus protein–protein interactions by LSTM with word2vec
+(Tsukiyama et al. 2021, https://doi.org/10.1093/bib/bbab228)
+
+Negatives in this set were created by dissimilarity negative sampling method.
+
+- `negative_samples.csv`: Actual negative interaction data
+- `tsukiyama_negatives_with_taxon.fasta`: `fasta` file retrieved from uniprot that contains the taxon data for the
+viral proteins
 
 ## Other
 
