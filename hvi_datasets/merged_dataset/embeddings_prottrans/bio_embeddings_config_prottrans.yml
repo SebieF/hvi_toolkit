@@ -1,0 +1,11 @@
+global:
+  sequences_file: ../merged_dataset_complete.fasta
+  prefix: embeddings_prottrans
+  simple_remapping: True
+embeddings:
+  type: 'embed'
+  protocol: prottrans_t5_xl_u50
+  reduce: True
+  discard_per_amino_acid_embeddings: True
+  half_precision_model: False
+  model_directory: /bio_embeddings/models/prottrans_t5_xl_u50/model_directory
