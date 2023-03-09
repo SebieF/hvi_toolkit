@@ -1,9 +1,9 @@
 from hvi_mitab25_dataset import DatasetMITAB25
 
 
-class DatasetVirusHostNet3(DatasetMITAB25):
+class DatasetVirHostNet3(DatasetMITAB25):
     """
-    VirusHostNet3.0, successor of VirHostNet 2.0: surfing on the web of virus/host molecular interactions data
+    VirHostNet3.0, successor of VirHostNet 2.0: surfing on the web of virus/host molecular interactions data
     (Guirimand et al. 2014, https://doi.org/10.1093/nar/gku1121)
 
     URL: https://virhostnet.prabi.fr/
