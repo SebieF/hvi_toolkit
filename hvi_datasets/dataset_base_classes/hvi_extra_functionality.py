@@ -69,10 +69,11 @@ class DatasetHVIStdExtraFunctionality:
         category_names = counts[0:n].index.tolist()
         selected_dataframe = self.data_frame[self.data_frame[category].isin(category_names)]
 
-        return DatasetHVIStdExtraFunctionality(data_frame=selected_dataframe)
+        return self.__class__(data_frame=selected_dataframe)
 
     def remove_unavailable_and_overlong_sequences(self, fasta_file_path: str,
-                                                  seq_len_threshold: int = 10000) -> DatasetHVIStdExtraFunctionality:
+                                                  seq_len_threshold: int = 10000) -> \
+            Tuple[str, DatasetHVIStdExtraFunctionality]:
         """
         This function takes a path to a FASTA file and a threshold sequence length.
         It removes all sequences from the dataset that are not present in the FASTA file
@@ -81,7 +82,8 @@ class DatasetHVIStdExtraFunctionality:
 
         :param fasta_file_path: The path to a FASTA file containing the sequences to filter against
         :param seq_len_threshold: Integer representing the maximum allowed length of sequences. Default: 10,000
-        :return: A new DatasetHVIStdExtraFunctionality object with the filtered data
+        :return: A Tuple with the fasta string without the unavailable or overlong sequences and a
+        new DatasetHVIStdExtraFunctionality object with the filtered data
         :except AssertionError if the fasta file contains duplicates
         """
 
@@ -89,6 +91,7 @@ class DatasetHVIStdExtraFunctionality:
 
         fasta_file = list(SeqIO.parse(fasta_file_path, "fasta"))
         ids_from_fasta = [seq.id for seq in fasta_file]
+        ids_to_sequence = {seq.id: seq.seq for seq in fasta_file}
         assert len(ids_from_fasta) == len(set(ids_from_fasta)), "Fasta contains duplicates!"
 
         # Remove not matching dataset-fasta (=> No sequence data)
@@ -97,8 +100,8 @@ class DatasetHVIStdExtraFunctionality:
             if unique_id not in ids_from_fasta:
                 non_matching.append(unique_id)
         print(f"Removing {len(non_matching)} non-matching ids: {non_matching}")
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_human"].isin(non_matching)]
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_virus"].isin(non_matching)]
+        dropped_df = self.data_frame[~self.data_frame["Uniprot_human"].isin(non_matching)]
+        dropped_df = dropped_df[~dropped_df["Uniprot_virus"].isin(non_matching)]
 
         # Remove sequences > seq_len_threshold
         overlong = []
@@ -106,8 +109,10 @@ class DatasetHVIStdExtraFunctionality:
             if len(seq.seq) > seq_len_threshold:
                 overlong.append(seq.id)
         print(f"Removing {len(overlong)} overlong ids: {overlong}")
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_human"].isin(overlong)]
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_virus"].isin(overlong)]
+        dropped_df = dropped_df[~dropped_df["Uniprot_human"].isin(overlong)]
+        dropped_df = dropped_df[~dropped_df["Uniprot_virus"].isin(overlong)]
+
+        standardized_dataset_dropped = self.__class__(data_frame=dropped_df)
 
         return DatasetHVIStdExtraFunctionality(data_frame=self.data_frame)
 
@@ -168,7 +173,8 @@ class DatasetHVIStdExtraFunctionality:
                              e.g. "sequence identity" or "embeddings distance"
         :param mode: Clustering mode, either "heuristic" or "naive". If mode is "heuristic", the function calculates the
                      interaction values for each interactor in clusters using
-                     _calculate_interaction_values_by_heuristic() function.
+                     _calculate_interaction_values_by_heuristic() function. This means that the "cluster representative"
+                     is not necessarily kept!
                      If mode is "naive", the first interactor in each cluster is kept, and the rest is dropped.
                      Default: "heuristic".
         :return: A tuple containing a list of IDs that have been dropped and the updated dataset
@@ -191,11 +197,11 @@ class DatasetHVIStdExtraFunctionality:
                     ids_to_drop.extend(cluster[1:])
 
         length_before = len(self.data_frame)
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_human"].isin(ids_to_drop)]
-        self.data_frame = self.data_frame[~self.data_frame["Uniprot_virus"].isin(ids_to_drop)]
-        length_after = len(self.data_frame)
+        dropped_df = self.data_frame[~self.data_frame["Uniprot_human"].isin(ids_to_drop)]
+        dropped_df = dropped_df[~dropped_df["Uniprot_virus"].isin(ids_to_drop)]
+        length_after = len(dropped_df)
         print(f"Loss of interactions due to {cluster_name} clustering: \n"
               f"Before: {length_before}, After: {length_after}, Loss: {length_before - length_after} "
               f"({100 * (length_before - length_after) / length_before} %)")
 
-        return ids_to_drop, DatasetHVIStdExtraFunctionality(data_frame=self.data_frame)
+        return ids_to_drop, self.__class__(data_frame=dropped_df)
