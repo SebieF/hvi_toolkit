@@ -32,7 +32,9 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
                 VirusHostNet:   MI-Score > 0.6 (strict, see paper)
                 SarsIM28880:    MI-Score > 0.6 (strict, see paper)
                 Viruses.String: experimental > 0
+            Target:         1 if positive interaction else 0
     """
+
     name = "standardized:"
     delimiter = ","
     header = 0
@@ -121,12 +123,18 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
                         entries_keep.append(e_r)
                 return entries_keep
 
+            def str2bool(s):
+                return s.lower() in ["true", "1"]
+
             for keep, remove in duplicates:
                 self.data_frame["Taxon_virus"].iloc[keep] = ",".join(merge_entries("Taxon_virus", keep, remove))
                 self.data_frame["Dataset"].iloc[keep] = ",".join(merge_entries("Dataset", keep, remove))
                 # Experimental: keep == True or remove == True
-                self.data_frame["Experimental"].iloc[keep] = str(bool(self.data_frame["Experimental"].iloc[keep]) or
-                                                                 bool(self.data_frame["Experimental"].iloc[remove]))
+                self.data_frame["Experimental"].iloc[keep] = str(str2bool(self.data_frame["Experimental"].iloc[keep]) or
+                                                                 str2bool(self.data_frame["Experimental"].iloc[remove]))
+                # Target: keep == Positive or remove == Positive
+                self.data_frame["Target"].iloc[keep] = str(int(str2bool(self.data_frame["Target"].iloc[keep]) or
+                                                               str2bool(self.data_frame["Target"].iloc[remove])))
             self.data_frame.drop([remove for _, remove in duplicates], inplace=True)
             self.data_frame.reset_index(drop=True, inplace=True)
             print(f"Dropped {len(duplicates)} duplicated interactions from {self.name}! "

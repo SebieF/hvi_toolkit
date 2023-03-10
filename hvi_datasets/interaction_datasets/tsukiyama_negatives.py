@@ -86,11 +86,14 @@ class DatasetTsukiyamaNegatives(DatasetHVI):
 
         series_experimental = pd.Series([False] * len(series_protein_human))
 
+        series_target = pd.Series(["0"] * len(self.data_frame))
+
         series = {"Uniprot_human": series_protein_human,
                   "Uniprot_virus": series_protein_virus,
                   "Taxon_virus": series_taxon_virus,
                   "Dataset": series_dataset_name,
-                  "Experimental": series_experimental}
+                  "Experimental": series_experimental,
+                  "Target": series_target}
 
         standardized_df = pd.DataFrame(series)
         hvi_std = DatasetHVIStandardized(data_frame=standardized_df, name=self.name, taxonomy=taxonomy)

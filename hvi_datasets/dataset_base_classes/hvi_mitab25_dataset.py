@@ -149,11 +149,14 @@ class DatasetMITAB25(DatasetHVI):
         series_experimental_b = human_hosts_b["Confidence_Score"].astype(float) > 0.6
         series_experimental = pd.concat([series_experimental_a, series_experimental_b], ignore_index=True)
 
+        series_target = pd.Series(["1"] * len(series_taxon_virus))
+
         series = {"Uniprot_human": series_protein_human,
                   "Uniprot_virus": series_protein_virus,
                   "Taxon_virus": series_taxon_virus,
                   "Dataset": series_dataset_name,
-                  "Experimental": series_experimental}
+                  "Experimental": series_experimental,
+                  "Target": series_target}
 
         standardized_df = pd.DataFrame(series)
         hvi_std = DatasetHVIStandardized(data_frame=standardized_df, name=self.name, taxonomy=taxonomy)
