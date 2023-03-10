@@ -4,12 +4,15 @@ import tempfile
 import subprocess
 import numpy as np
 import pandas as pd
-from Bio import SeqIO
 
+from Bio import SeqIO
 from tqdm import tqdm
-from typing import List, Dict, Tuple, Any
+from collections import namedtuple
 from itertools import combinations
+from typing import List, Dict, Tuple, Any
 from hvi_datasets.dataset_base_classes import DatasetHVIStandardized
+
+DistanceValues = namedtuple("DistanceValues", "min max avg")
 
 
 class RedundancyReduction:
@@ -216,16 +219,18 @@ class RedundancyReduction:
         return human_embeddings, viral_embeddings
 
     def _calculate_euclidean_distances(self, sequence_pairs: List,
-                                       name: str = "") -> Tuple[List, Dict[str, Dict[str, float]]]:
+                                       name: str = "") -> Tuple[DistanceValues, Dict[str, Dict[str, float]]]:
         """
         Calculates the euclidean distance between the embeddings of all given sequence pairs
         
         :param sequence_pairs: List of pair-wise sequences
         :param name: Name of this round of euclidean clustering
-        :return: Tuple with all calculated distances and a distance dict that contains the distance for all pairs
+        :return: Tuple with all calculated distance metrics and a distance dict that contains the distance for all pairs
         """
 
-        distance_values = []
+        distance_min = np.Inf
+        distance_max = 0
+        distance_sum = 0
         distance_dict = {}
         print(f"Calculating {name} euclidean distances..")
         for seq_id1, seq_id2 in sequence_pairs:
@@ -236,18 +241,20 @@ class RedundancyReduction:
             embedding1 = self.id2emb_sequence[seq_id1]
             embedding2 = self.id2emb_sequence[seq_id2]
             euclidean_distance = np.linalg.norm(embedding1 - embedding2)
-            distance_values.append(euclidean_distance)
+            distance_min = min(distance_min, euclidean_distance)
+            distance_max = max(distance_max, euclidean_distance)
+            distance_sum += euclidean_distance
 
             if euclidean_distance < self.embeddings_threshold:
                 distance_dict[seq_id1][seq_id2] = euclidean_distance
                 distance_dict[seq_id2][seq_id1] = euclidean_distance
-        return distance_values, distance_dict
+        return DistanceValues(distance_min, distance_max, distance_sum/len(sequence_pairs)), distance_dict
 
     @staticmethod
-    def _print_distances(distance_values, name: str = ""):
-        print(f"Average distance {name}: {sum(distance_values) / len(distance_values)}")
-        print(f"Max distance {name}: {max(distance_values)}")
-        print(f"Min distance {name}: {min(distance_values)}")
+    def _print_distances(distance_values: DistanceValues, name: str = ""):
+        print(f"Average distance {name}: {distance_values.avg}")
+        print(f"Max distance {name}: {distance_values.max}")
+        print(f"Min distance {name}: {distance_values.min}")
 
     @staticmethod
     def _drop_embeddings_by_ids(ids_to_drop: List[str], embeddings: Dict[str, Any], name: str = "") -> Dict[str, Any]:
@@ -275,9 +282,9 @@ class RedundancyReduction:
         """
 
         sequence_pairs = list(combinations(sequence_ids, 2))
-        euclidean_distances, _ = self._calculate_euclidean_distances(sequence_pairs, name=name)
-        self._print_distances(distance_values=euclidean_distances, name=name)
-        assert min(euclidean_distances) > self.embeddings_threshold
+        distance_values, _ = self._calculate_euclidean_distances(sequence_pairs, name=name)
+        self._print_distances(distance_values=distance_values, name=name)
+        assert distance_values.min > self.embeddings_threshold
 
     def _euclidean_distance_reduction(self, mmseqs_filtered_dataset: DatasetHVIStandardized) -> DatasetHVIStandardized:
         """
@@ -295,8 +302,8 @@ class RedundancyReduction:
 
             # Calculate euclidean distances
             sequence_pairs = list(combinations(current_embeddings.keys(), 2))
-            euclidean_distances, distance_dict = self._calculate_euclidean_distances(sequence_pairs, name=name)
-            self._print_distances(euclidean_distances, name=name)
+            distance_values, distance_dict = self._calculate_euclidean_distances(sequence_pairs, name=name)
+            self._print_distances(distance_values, name=name)
 
             euclidean_cluster_dict = self._distance_result_to_cluster_dict(distance_dict=distance_dict)
 
@@ -308,7 +315,7 @@ class RedundancyReduction:
                 mode=mode
             )
 
-            del euclidean_distances
+            del distance_values
             del distance_dict
             del euclidean_cluster_dict
             del sequence_pairs  # Necessary because memory allocation can get too big
@@ -350,7 +357,7 @@ def main():
             "csv_path": "../merged_dataset/merged_dataset_complete.csv",
             "fasta_path": "../merged_dataset/merged_dataset_complete.fasta",
             "sequence_embeddings_path": "../merged_dataset/embeddings_prottrans/reduced_embeddings_file.h5",
-            "output_path": "../merged_dataset/",
+            "output_path": "../merged_dataset/redundancy_reduction/",
             "execute": True
         },
     ]
