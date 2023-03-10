@@ -1,0 +1,27 @@
+sequence_file: biotrainer_hvi_interactions.fasta
+protocol: sequence_to_class
+interaction: concat
+model_choice: FNN
+dropout_rate: [0.1, 0.25]
+bottleneck_dim: [256, 512]
+optimizer_choice: adam
+loss_choice: cross_entropy_loss
+num_epochs: 400
+use_class_weights: [True, False]
+learning_rate: [1e-2, 1e-3]
+batch_size: [32, 128]
+save_split_ids: True
+patience: 20
+embeddings_file: ../hvi_datasets/merged_dataset/embeddings_prottrans/reduced_embeddings_file.h5
+auto_resume: False
+ignore_file_inconsistencies: True
+cross_validation_config:
+  method: k_fold
+  choose_by: recall
+  k: 5
+  stratified: True
+  repeat: 1
+  nested: True
+  nested_k: 5
+  search_method: random_search
+  n_max_evaluations_random: 5
