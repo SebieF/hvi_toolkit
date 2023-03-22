@@ -1,5 +1,13 @@
 # Rabies Lyssavirus predictions
 
+## Interactome predictions
+
+`rabies_lyssa_human_interactome_predictions.csv`
+
+This file contains a prediction for all 1,235,520 possible interactions between known human and rabies lyssavirus
+proteins. *Please do take these predictions with a grain of sand and analyze them further before drawing 
+biological conclusions!*
+
 ## Experimental known interactions
 
 `lyssa_experimental_interactions.csv` and `lyssa_experimental_interactions.ods`
