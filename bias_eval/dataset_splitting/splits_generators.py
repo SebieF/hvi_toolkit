@@ -29,7 +29,7 @@ class SplitsGenerator:
         :param std_dataset: Dataset with human-virus interactions
         :param full_fasta_file: Optional fasta file with all sequences for the proteins in the dataset.
                                 If the fasta file is not given, dummy sequences are written to the biotrainer file.
-        :return:
+        :return: SplitsGenerator object
         """
         # Create list of interactions (compatible with sklearn train_test_split)
         interaction_dataset = std_dataset.to_interaction_list()
@@ -85,7 +85,7 @@ class SplitsGenerator:
 
         :param interactions: List of interactions
         :param hub_threshold: Threshold to determine protein hubs (# Interactions >= hub_threshold => Protein is hub)
-        :return Tuple with list of protein hub interactions and a set with the ids of all hub proteins
+        :return: Tuple with list of protein hub interactions and a set with the ids of all hub proteins
         """
 
         protein_counter_dict = {}
