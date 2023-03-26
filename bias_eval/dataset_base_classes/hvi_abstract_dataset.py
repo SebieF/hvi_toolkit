@@ -8,7 +8,7 @@ import more_itertools
 
 from tqdm import tqdm
 from abc import abstractmethod, ABC
-from hvi_datasets.taxonomy import Taxonomy
+from bias_eval.taxonomy import Taxonomy
 from typing import Optional, List, Dict, Final, Union
 
 

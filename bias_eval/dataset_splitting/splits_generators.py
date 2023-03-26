@@ -4,7 +4,7 @@ from abc import abstractmethod
 from collections import namedtuple
 from typing import List, Dict, Tuple, Set
 from sklearn.model_selection import train_test_split
-from hvi_datasets.dataset_base_classes import DatasetHVIStandardized
+from bias_eval.dataset_base_classes import DatasetHVIStandardized
 
 Interaction = namedtuple("Interaction", "uniprot_human uniprot_virus family_virus target")
 

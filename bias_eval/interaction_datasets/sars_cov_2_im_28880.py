@@ -1,4 +1,4 @@
-from hvi_datasets.dataset_base_classes import DatasetMITAB25
+from bias_eval.dataset_base_classes import DatasetMITAB25
 
 
 class DatasetSarsCov2IM28880(DatasetMITAB25):

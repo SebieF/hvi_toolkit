@@ -1,7 +1,7 @@
 from tqdm import tqdm
 
-from hvi_datasets.taxonomy import Taxonomy
-from hvi_datasets.dataset_base_classes import DatasetMITAB25
+from bias_eval.taxonomy import Taxonomy
+from bias_eval.dataset_base_classes import DatasetMITAB25
 
 
 class DatasetIntactPositive(DatasetMITAB25):

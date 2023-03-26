@@ -10,7 +10,7 @@ from tqdm import tqdm
 from collections import namedtuple
 from itertools import combinations
 from typing import List, Dict, Tuple, Any
-from hvi_datasets.dataset_base_classes import DatasetHVIStandardized
+from bias_eval.dataset_base_classes import DatasetHVIStandardized
 
 DistanceValues = namedtuple("DistanceValues", "min max avg")
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 
 from typing import List, Optional
-from hvi_datasets.taxonomy import Taxonomy
+from bias_eval.taxonomy import Taxonomy
 
 from .hvi_abstract_dataset import DatasetHVI
 from .hvi_extra_functionality import DatasetHVIStdExtraFunctionality

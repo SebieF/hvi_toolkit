@@ -1,8 +1,8 @@
 import pandas as pd
 
-from hvi_datasets.taxonomy import Taxonomy
-from hvi_datasets.dataset_base_classes import DatasetHVI
-from hvi_datasets.dataset_base_classes import DatasetHVIStandardized
+from bias_eval.taxonomy import Taxonomy
+from bias_eval.dataset_base_classes import DatasetHVI
+from bias_eval.dataset_base_classes import DatasetHVIStandardized
 
 
 class DatasetRabiesLyssavirusExperimental(DatasetHVI):
