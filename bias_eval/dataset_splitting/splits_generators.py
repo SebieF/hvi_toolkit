@@ -1,13 +1,11 @@
 from Bio import SeqIO
 from pathlib import Path
 from abc import abstractmethod
-from collections import namedtuple
 from typing import List, Dict, Tuple, Set
 from sklearn.model_selection import train_test_split
+
+from bias_eval.utilities import Interaction
 from bias_eval.dataset_base_classes import DatasetHVIStandardized
-
-Interaction = namedtuple("Interaction", "uniprot_human uniprot_virus family_virus target")
-
 
 class SplitsGenerator:
     """
@@ -34,12 +32,9 @@ class SplitsGenerator:
         :return:
         """
         # Create list of interactions (compatible with sklearn train_test_split)
-        interaction_dataset = []
-        for _, row in std_dataset.data_frame.iterrows():
-            interaction = Interaction(uniprot_human=row["Uniprot_human"], uniprot_virus=row["Uniprot_virus"],
-                                      family_virus=row["Family_virus"], target=row["Target"])
-            interaction_dataset.append(interaction)
-        # Create seqs
+        interaction_dataset = std_dataset.to_interaction_list()
+
+        # Load seqs
         if full_fasta_file != "":
             id2seq = {seq.id: seq.seq for seq in list(SeqIO.parse(full_fasta_file, "fasta"))}
         else:

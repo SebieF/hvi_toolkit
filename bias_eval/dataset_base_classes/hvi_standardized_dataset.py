@@ -4,6 +4,7 @@ import pandas as pd
 
 from typing import List, Optional
 from bias_eval.taxonomy import Taxonomy
+from bias_eval.utilities import Interaction
 
 from .hvi_abstract_dataset import DatasetHVI
 from .hvi_extra_functionality import DatasetHVIStdExtraFunctionality
@@ -209,7 +210,28 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
         return hvi_std
 
     def store(self, file_path: str):
+        """
+        Stores this dataset. The created file can be loaded again via the constructor.
+
+        :param file_path: Path where to store the data_frame
+        """
         self.data_frame.to_csv(file_path, header=True, index=False)
+
+    def to_interaction_list(self) -> List[Interaction]:
+        """
+        Creates a list of interactions from this standardized dataset. Lists are sometimes easier to handle
+        for other packages, e.g. creating splits via from sklearn.model_selection.train_test_split.
+        Pandas data frames are, in turn, more useful for feature selection and de-duplication.
+
+        :return: List of all interactions in this dataset
+        """
+        interaction_list = []
+        for _, row in self.data_frame.iterrows():
+            interaction = Interaction(uniprot_human=row["Uniprot_human"], uniprot_virus=row["Uniprot_virus"],
+                                      family_virus=row["Family_virus"], experimental=row["Experimental"],
+                                      target=row["Target"])
+            interaction_list.append(interaction)
+        return interaction_list
 
     def to_standardized_dataset(self, taxonomy: Taxonomy):
         return self
