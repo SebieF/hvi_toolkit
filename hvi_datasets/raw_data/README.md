@@ -91,6 +91,21 @@ Negatives in this set were created by dissimilarity negative sampling method.
 - `tsukiyama_negatives_with_taxon.fasta`: `fasta` file retrieved from uniprot that contains the taxon data for the
 viral proteins
 
+### Negatome 2.0
+
+`negatome2.zip`
+
+Negatome dataset from Negatome 2.0: a database of non-interacting proteins derived by literature mining, 
+manual annotation and protein structure analysis
+(Blohm et al. 2014, https://doi.org/10.1093/nar/gkt1079)
+
+This dataset contains experimentally verified negative protein-protein interactions. It is not specific to 
+human-virus interactions!
+
+- `negatome_2_combined_stringent.fasta`: Contains all sequences for the proteins
+- `negatome_2_combined_stringent.txt`: Contains the interactions as tab separated values
+- `negatome_reduced_prottrans.h5`: Contains prottrans per-sequence embeddings for the sequences in the fasta file
+
 ## Other
 
 ### Taxonomy
