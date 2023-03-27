@@ -26,23 +26,25 @@ as examples.
 If you are not using a model trained via [biotrainer](https://github.com/sacdallago/biotrainer), you can still use
 `ModelEvaluator`. All you need to do is to provide a `ModelWrapper` class that creates interaction predictions 
 from embeddings (i.e. from a vector of floats):
+
 ```python
 
-from bias_eval.evaluators import ModelWrapper
+from hvi_toolkit.evaluators import ModelWrapper
 from typing import Union, Iterable, Dict, List, Any
+
 
 class ModelWrapperCustom(ModelWrapper):
 
-    def from_embeddings(self, embeddings: Union[Iterable, Dict]) -> List[Any]:
-        """
-        Wrapper method to calculate predictions from embeddings. If you want to evaluate your model via the
-        ModelEvaluator, but you are not using biotrainer and its inferencer module, you can inherit from this
-        class and overwrite this method. The method must return a list with the predictions.
+  def from_embeddings(self, embeddings: Union[Iterable, Dict]) -> List[Any]:
+    """
+    Wrapper method to calculate predictions from embeddings. If you want to evaluate your model via the
+    ModelEvaluator, but you are not using biotrainer and its inferencer module, you can inherit from this
+    class and overwrite this method. The method must return a list with the predictions.
 
-        :param embeddings: Iterable or dictionary containing the input embeddings to predict on.
-        :return: List with class or value prediction from the given embeddings.
-        """
-        raise NotImplementedError
+    :param embeddings: Iterable or dictionary containing the input embeddings to predict on.
+    :return: List with class or value prediction from the given embeddings.
+    """
+    raise NotImplementedError
 ```
 
 In addition, you can check your model via adversarial input. At the moment, only a prototype version to test if the

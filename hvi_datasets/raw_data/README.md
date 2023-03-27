@@ -76,6 +76,15 @@ URL: http://viruses.string-db.org/download/protein.links.detailed.v10.5/9606.pro
 
 Contains the non-uniprot-id identifiers from the Viruses.STRING dataset and the respective mappings (if available)
 
+### rabies_lyssavirus_zandi
+
+Experimentally verified Rabies Lyssavirus interactions: Interactions extracted from a paper of Zandi et al. 2021 
+(https://doi.org/10.52547%2Fibj.25.4.226).
+
+Interactions are contained in `lyssa_experimental_interactions.csv` and `lyssa_experimental_interactions.ods`
+(The two files are equivalent, but .ods files are a bit easier to maintain). See also the README file in this
+directory for further information.
+
 ## Negative datasets
 
 ### Tsukiyama
