@@ -32,4 +32,5 @@ def calculate_all_metrics(predictions: List, targets: List, df_name: str) -> pd.
                                                                   metric=metric_key).item()]
                                     for metric_key in CLASSIFICATION_METRICS}).T
     metrics_df.name = df_name
+    metrics_df.rename(columns={0: df_name}, inplace=True)
     return metrics_df
