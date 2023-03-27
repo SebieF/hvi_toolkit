@@ -87,7 +87,7 @@ class DatasetEvaluator:
         fore = Fore.BLACK
         if test_statistic_bias < 0.90:
             fore = Fore.RED
-        print(f"\n**DATASET BIAS:**")
+        print(f"\n**Dataset bias:**")
         print(f"Correlation between negative and positive interactions: {fore}{test_statistic_bias} "
               f"(p-value: {p_value_bias})")
         if test_statistic_bias < 0.90:
@@ -246,9 +246,15 @@ class DatasetEvaluator:
         # 3. Viral families
         viral_families = {}
         for interaction in interaction_list:
-            if interaction.family_virus not in viral_families:
-                viral_families[interaction.family_virus] = 0
-            viral_families[interaction.family_virus] += 1
+            viral_families_int = []  # Sometimes more than one associated family
+            if "," in interaction.family_virus:
+                viral_families_int.extend(interaction.family_virus.split(","))
+            else:
+                viral_families_int.append(interaction.family_virus)
+            for viral_family in viral_families_int:
+                if viral_family not in viral_families.keys():
+                    viral_families[viral_family] = 0
+                viral_families[viral_family] += 1
         self._check_uniform_distribution(category_frequencies=viral_families, name="Viral families")
 
         # 4. Sequence lengths
