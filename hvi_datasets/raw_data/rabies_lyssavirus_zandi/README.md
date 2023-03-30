@@ -40,6 +40,8 @@ vaccination, taxon id: 11300
 * SHBRV: Rabies virus (strain silver-haired bat-associated), associated with most human rabies cases in the US
   (https://doi.org/10.1371%2Fjournal.pone.0155542), taxon id: 445793
 
+* DLC1,2: Dynein light chain 1/2
+
 **Viruses Omitted**:
 * Field strains, EBLV-1, EBLV-2, street virus GX/09, WCBV, MOKV, LBV, Thailand (not in swiss prot), a street strain
   (31613 M not in Uniprot), P3 and P5 isoform, ABLV, 8743THA, Ni, Ni-CE, street strains 1088 and HCM-9, DRV-Mexico
@@ -49,7 +51,6 @@ vaccination, taxon id: 11300
 **Unclear/Omitted human proteins**:
 * HSP70 1A/1B
 * RelAp43 (splicing analog of RelA, https://www.researchgate.net/figure/Residues-at-positions-77-and-104-are-necessary-for-the-interaction-of-M-Tha-with-RelAp43_fig3_311867837)
-* DLC2, Q86XT0 not available in swissprot (omitted)
 * TUB α/β
 * NCL
 * FAK
