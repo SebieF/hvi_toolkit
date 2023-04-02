@@ -57,7 +57,7 @@ makes it easy to combine and analyze the data sources.
 
 Already implemented interaction datasets can be found in the `interaction_datasets` package.
 Raw data associated with them is provided in `raw_data`. 
-The notebook `hvi_datasets7merged_dataset/merge_datasets.ipynb` shows how to merge all the provided datasets
+The notebook `hvi_datasets/merged_dataset/merge_datasets.ipynb` shows how to merge all the provided datasets
 into a single and large dataset.
 
 The `DatasetHVIStandardized` class can also be used for **redundancy reduction** on sequences and
