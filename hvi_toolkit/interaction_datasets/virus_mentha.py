@@ -28,6 +28,10 @@ class DatasetVirusMentha(DatasetHVI):
         PMID: Pubmed ID
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return "Protein A;Gene A;Taxon A;Family A;Protein B;Gene B;Taxon B;Family B;Score;PMID"
+
     delimiter = ";"
     name = "virus_mentha"
     header = "infer"

@@ -36,6 +36,10 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
             Target:         1 if positive interaction else 0
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return "Uniprot_human,Uniprot_virus,Taxon_virus,Dataset,Experimental,Target,Family_virus"
+
     name = "standardized:"
     delimiter = ","
     header = 0
@@ -208,14 +212,6 @@ class DatasetHVIStandardized(DatasetHVI, DatasetHVIStdExtraFunctionality):
 
         hvi_std = DatasetHVIStandardized(data_frame=merged_dataset, name=new_name)
         return hvi_std
-
-    def store(self, file_path: str):
-        """
-        Stores this dataset. The created file can be loaded again via the constructor.
-
-        :param file_path: Path where to store the data_frame
-        """
-        self.data_frame.to_csv(file_path, header=True, index=False)
 
     def to_interaction_list(self) -> List[Interaction]:
         """

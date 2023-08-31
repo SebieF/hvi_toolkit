@@ -27,6 +27,10 @@ class DatasetVirusesString(DatasetHVI):
     combined_score
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return "protein1 protein2 neighborhood fusion cooccurence coexpression experimental database textmining combined_score"
+
     delimiter = " "
     name = "viruses_string"
     header = "infer"

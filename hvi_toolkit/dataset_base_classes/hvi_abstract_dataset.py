@@ -196,43 +196,25 @@ class DatasetHVI(ABC):
         """
         return self.__class__(data_frame=self.data_frame[self.data_frame[category].isin([condition])])
 
+    def store(self, file_path: str = None) -> Optional[str, None]:
+        """
+        Stores this dataset. The created file can be loaded again via the constructor.
+        If no file_path is given, the csv is returned as a string.
+
+        :param file_path: Path where to store the data_frame
+        """
+        if file_path is None:
+            return self.data_frame.to_csv(header=True, index=False)
+        else:
+            self.data_frame.to_csv(file_path, header=True, index=False)
+
+    @staticmethod
     @abstractmethod
-    def get_lyssa_associated_interactions(self) -> DatasetHVI:
+    def get_header() -> str:
         """
-        Abstract method to get interactions associated with lyssa viruses.
+        Returns the header of this specific dataset format
 
-        :raises: NotImplementedError
-        :rtype: DatasetHVI
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_sars_cov_2_associated_interactions(self) -> DatasetHVI:
-        """
-        Abstract method to get interactions associated with sars-cov-2 viruses.
-
-        :raises: NotImplementedError
-        :rtype: DatasetHVI
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_rhabdoviridae_associated_interactions(self) -> DatasetHVI:
-        """
-        Abstract method to get interactions associated with rhabdoviridae viruses.
-
-        :raises: NotImplementedError
-        :rtype: DatasetHVI
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_coronaviridae_associated_interactions(self) -> DatasetHVI:
-        """
-        Abstract method to get interactions associated with coronaviridae viruses.
-
-        :raises: NotImplementedError
-        :rtype: DatasetHVI
+        :return: Header of the specific dataset format
         """
         raise NotImplementedError
 

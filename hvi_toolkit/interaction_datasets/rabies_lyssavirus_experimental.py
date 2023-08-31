@@ -22,6 +22,11 @@ class DatasetRabiesLyssavirusExperimental(DatasetHVI):
     * Viral_family: Viral family of Lyssavirus, i.e. Rhabdoviridae for all entries
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return ("Protein ,Lyssavirus ,Taxon_virus,Uniprot_virus,Uniprot_human,Host protein interactor ,Method of PPI "
+                "detection and reference(s) ,Viral_family")
+
     delimiter = ","
     name = "rabies_lyssavirus_experimental"
     header = "infer"
