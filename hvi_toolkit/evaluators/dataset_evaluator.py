@@ -1,7 +1,4 @@
-import colorama
-
-from colorama import Fore
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from scipy.stats import pearsonr, ttest_ind, chisquare
 from biotrainer.utilities import read_FASTA, get_attributes_from_seqrecords_for_protein_interactions, get_split_lists, \
     INTERACTION_INDICATOR
@@ -10,8 +7,6 @@ from hvi_toolkit.dataset_splitting import SplitsGenerator
 from hvi_toolkit.utilities import Interaction
 from hvi_toolkit.dataset_base_classes import DatasetHVIStandardized
 from .metrics_calculator import calculate_all_metrics
-
-colorama.init(autoreset=True)
 
 
 class DatasetEvaluator:
@@ -34,6 +29,31 @@ class DatasetEvaluator:
         self.bias_threshold = bias_threshold
 
     @staticmethod
+    def convert_biotrainer_fasta_to_interaction_list(biotrainer_fasta_path: str):
+        seq_records = read_FASTA(biotrainer_fasta_path)
+        id2seq = {seq.id: seq for seq in seq_records}
+        id2attributes = get_attributes_from_seqrecords_for_protein_interactions(seq_records)
+        train, val, test = tuple(map(set, get_split_lists(id2attributes)))
+
+        interaction_list = []
+        for interaction_id, attrs in id2attributes.items():
+            uniprot_human = interaction_id.split(INTERACTION_INDICATOR)[0]
+            uniprot_virus = interaction_id.split(INTERACTION_INDICATOR)[1]
+            target = attrs["TARGET"]
+            interaction = Interaction(uniprot_human=uniprot_human, uniprot_virus=uniprot_virus,
+                                      family_virus="", experimental="",
+                                      target=target)
+            interaction_list.append(interaction)
+        train_interactions = [interaction for interaction in interaction_list
+                              if DatasetEvaluator._get_interaction_id(interaction) in train]
+        val_interactions = [interaction for interaction in interaction_list
+                            if DatasetEvaluator._get_interaction_id(interaction) in val]
+        test_interactions = [interaction for interaction in interaction_list
+                             if DatasetEvaluator._get_interaction_id(interaction) in test]
+
+        return id2seq, interaction_list, train_interactions, val_interactions, test_interactions
+
+    @staticmethod
     def _get_interaction_id(interaction: Interaction) -> str:
         """
         :return: An interaction id (protein_human&protein_virus) from an interaction object
@@ -41,7 +61,7 @@ class DatasetEvaluator:
         return f"{interaction.uniprot_human}{INTERACTION_INDICATOR}{interaction.uniprot_virus}"
 
     @staticmethod
-    def _calculate_dataset_bias(dataset: List[Interaction]) -> Any:
+    def calculate_dataset_bias(dataset: List[Interaction]) -> Tuple[float, float, Any]:
         """
             Calculates a dataset bias baseline for interactions (see for example
             Park, Marcotte 2011: https://doi.org/10.1093/bioinformatics/btr514).
@@ -84,31 +104,40 @@ class DatasetEvaluator:
 
             return 0 if neg_occurrences_total >= pos_occurrences_total else 1
 
-        fore = Fore.BLACK
-        if test_statistic_bias < 0.90:
-            fore = Fore.RED
-        print(f"\n**Dataset bias:**")
-        print(f"Correlation between negative and positive interactions: {fore}{test_statistic_bias} "
-              f"(p-value: {p_value_bias})")
-        if test_statistic_bias < 0.90:
-            print(f"Your dataset bias is quite high. The bias means that the frequency for proteins associated with \n"
-                  f"interactions differs substantially between the negative and positive set. \n"
-                  f"This will probably result in a high bias predictor baseline. \n"
-                  f"To improve, you can remove hub proteins for human and viral proteins. \n"
-                  f"Alternatively, you need to re-consider the creation of your negative dataset and \n"
-                  f"account for the characteristics of your ppi network.")
+        return test_statistic_bias, p_value_bias, bias_predictor
+
+    def evaluate_dataset_bias_test_result(self, test_statistic_bias: float, p_value_bias: float, do_print: bool):
+        success = test_statistic_bias > self.bias_threshold
+        information = ""
+        information += f"\n**Dataset bias:**"
+        information += f"Correlation between negative and positive interactions: {test_statistic_bias} "
+        f"(p-value: {p_value_bias})"
+        if not success:
+            information += f"Your dataset bias is quite high. The bias means that the frequency "
+            f"for proteins associated with \n"
+            f"interactions differs substantially between the negative and positive set. \n"
+            f"This will probably result in a high bias predictor baseline. \n"
+            f"To improve, you can remove hub proteins for human and viral proteins. \n"
+            f"Alternatively, you need to re-consider the creation of your negative dataset and \n"
+            f"account for the characteristics of your ppi network."
         else:
-            print(f"Your dataset bias is rather small. This indicates that your dataset represents the underlying "
-                  f"ppi network well.")
-        return bias_predictor
+            information += f"Your dataset bias is rather small. This indicates that your dataset represents the underlying "
+            f"ppi network well."
+        if do_print:
+            print(information)
+        return success, information
 
     @staticmethod
-    def _calculate_bias_predictions(bias_predictor: Any, test_dataset: List[Interaction], name: str):
+    def calculate_bias_predictions(bias_predictor: Any, test_dataset: List[Interaction], name: str, do_print: bool):
         """
         Calculates and reports classification metrics for the test_dataset from the bias predictor
 
         :param bias_predictor: Bias predictor (function from bias_baseline)
         :param test_dataset: Dataset to evaluate
+        :param name: Name of the dataset to evaluate
+        :param do_print: True - print test results
+
+        :return bias_metrics: Calculated metrics for predictions
         """
 
         # Predict all test_samples from bias
@@ -124,11 +153,12 @@ class DatasetEvaluator:
         bias_metrics = calculate_all_metrics(predictions=predictions,
                                              targets=test_set_targets,
                                              df_name=name)
+        if do_print:
+            print(f"\n**Bias baseline predictions for {name}:**")
+            print(bias_metrics)
+        return bias_metrics
 
-        print(f"\n**Bias baseline predictions for {name}:**")
-        print(bias_metrics)
-
-    def _check_sequence_lengths(self, interactions: List[Interaction], id2seq: Dict[str, str]):
+    def check_sequence_lengths(self, interactions: List[Interaction], id2seq: Dict[str, str]):
         """
         Check if sequence lengths differ significantly between positive and negative interactions.
 
@@ -153,19 +183,31 @@ class DatasetEvaluator:
             if len(positive_sequence_lengths) > 0 else 0
         average_length_negative = sum(negative_sequence_lengths) / len(negative_sequence_lengths) \
             if len(negative_sequence_lengths) > 0 else 0
-        print(f"\n**Sequence lengths:**")
-        print(
-            f"Average length positive: {average_length_positive} (# Positive: {len(positive_sequence_lengths)})")
-        print(
-            f"Average length negative: {average_length_negative} (# Negative: {len(negative_sequence_lengths)})")
-        ttest_stat, ttest_p_value = ttest_ind(positive_sequence_lengths, negative_sequence_lengths)
-        if ttest_p_value < self.significance:
-            print("The lengths of your positive and negative interactions differ significantly!\n"
-                  "This might introduce bias to the model's predictions if it can infer the sequence lengths somehow.")
+        test_statistic_length, p_value_length = ttest_ind(positive_sequence_lengths, negative_sequence_lengths)
+
+        return (average_length_positive, average_length_negative, positive_sequence_lengths,
+                negative_sequence_lengths, test_statistic_length, p_value_length)
+
+    def evaluate_sequence_length_test_result(self, average_length_positive, average_length_negative,
+                                             positive_sequence_lengths, negative_sequence_lengths,
+                                             test_statistic_length,
+                                             p_value_length, do_print: bool):
+        success = p_value_length > self.significance
+        information = ""
+        information += f"\n**Sequence lengths:**"
+        information += f"Average length positive: {average_length_positive} (# Positive: {len(positive_sequence_lengths)})"
+        information += f"Average length negative: {average_length_negative} (# Negative: {len(negative_sequence_lengths)})"
+        if not success:
+            information += f"The lengths of your positive and negative interactions differ significantly!\n"
+            f"This might introduce bias to the model's predictions if it can infer "
+            f"the sequence lengths somehow."
         else:
-            print("The lengths of your positive and negative interactions do not differ significantly.\n"
-                  "The dataset is well balanced in this regard.")
-        print(f"T-test result: {ttest_stat} (p-value: {ttest_p_value})")
+            information += "The lengths of your positive and negative interactions do not differ significantly.\n"
+            "The dataset is well balanced in this regard."
+        information += f"T-test result: {test_statistic_length} (p-value: {p_value_length})"
+        if do_print:
+            print(information)
+        return success, information
 
     def _check_uniform_distribution(self, category_frequencies: Dict[str, int], name: str):
         """
@@ -180,9 +222,7 @@ class DatasetEvaluator:
         test_statistic_chi2, p_value_chi2 = chisquare(f_obs=list(category_frequencies.values()))
 
         print(f"\n**Uniform distribution: {name}**")
-        fore = Fore.BLACK
         if p_value_chi2 < self.significance:
-            fore = Fore.RED
             print(f"{name} category is not uniformly distributed within your dataset. This might be a reason for "
                   f"biased interactions!")
         else:
@@ -190,7 +230,7 @@ class DatasetEvaluator:
                   f"in this regard.")
         print(f"Most frequent: {maximum_category}")
         print(f"Least frequent: {minimum_category}")
-        print(f"{fore}Chi-squared test: {test_statistic_chi2} (p-value: {p_value_chi2})")
+        print(f"Chi-squared test: {test_statistic_chi2} (p-value: {p_value_chi2})")
 
     def _check_protein_hubs(self, interactions: List[Interaction]):
         """
@@ -231,17 +271,17 @@ class DatasetEvaluator:
         print(f"**Bias evaluation for dataset with {len(interaction_list)} interactions:**")
 
         # 1. Dataset bias
-        bias_predictor = self._calculate_dataset_bias(dataset=interaction_list)
+        bias_predictor = self.calculate_dataset_bias(dataset=interaction_list)
 
         # 2.a) Bias predictor metrics for whole dataset
-        self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=interaction_list,
-                                         name="Whole dataset")
+        _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=interaction_list,
+                                            name="Whole dataset", do_print=True)
 
         # 2.b) Bias predictor for hub interactions
         protein_hub_interactions = self._check_protein_hubs(interactions=interaction_list)
         if len(protein_hub_interactions) > 0:
-            self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
-                                             name="Hub interactions only")
+            _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
+                                                name="Hub interactions only", do_print=True)
 
         # 3. Viral families
         viral_families = {}
@@ -274,7 +314,14 @@ class DatasetEvaluator:
                 raise Exception(f"Provided fasta file does not contain sequences for all protein ids! \n"
                                 f"Missing: {missing_sequences}")
 
-            self._check_sequence_lengths(interactions=interaction_list, id2seq=id2seq)
+            (average_length_positive, average_length_negative, positive_sequence_lengths,
+             negative_sequence_lengths, test_statistic_length, p_value_length) = self.check_sequence_lengths(
+                interactions=interaction_list, id2seq=id2seq)
+            _ = self.evaluate_sequence_length_test_result(average_length_positive, average_length_negative,
+                                                          positive_sequence_lengths,
+                                                          negative_sequence_lengths, test_statistic_length,
+                                                          p_value_length,
+                                                          do_print=True)
 
     def evaluate_biotrainer_fasta(self, biotrainer_fasta_path: str):
         """
@@ -292,52 +339,44 @@ class DatasetEvaluator:
 
         :param biotrainer_fasta_path: Path to biotrainer fasta file (suited for interaction_mode)
         """
-        seq_records = read_FASTA(biotrainer_fasta_path)
-        id2seq = {seq.id: seq for seq in seq_records}
-        id2attributes = get_attributes_from_seqrecords_for_protein_interactions(seq_records)
-        train, val, test = tuple(map(set, get_split_lists(id2attributes)))
 
-        interaction_list = []
-        for interaction_id, attrs in id2attributes.items():
-            uniprot_human = interaction_id.split(INTERACTION_INDICATOR)[0]
-            uniprot_virus = interaction_id.split(INTERACTION_INDICATOR)[1]
-            target = attrs["TARGET"]
-            interaction = Interaction(uniprot_human=uniprot_human, uniprot_virus=uniprot_virus,
-                                      family_virus="", experimental="",
-                                      target=target)
-            interaction_list.append(interaction)
-        train_interactions = [interaction for interaction in interaction_list
-                              if self._get_interaction_id(interaction) in train]
-        val_interactions = [interaction for interaction in interaction_list
-                            if self._get_interaction_id(interaction) in val]
-        test_interactions = [interaction for interaction in interaction_list
-                             if self._get_interaction_id(interaction) in test]
+        (id2seq, interaction_list,
+         train_interactions, val_interactions, test_interactions) = (self.convert_biotrainer_fasta_to_interaction_list
+                                                                     (biotrainer_fasta_path))
 
         print(f"**Bias evaluation for dataset with {len(interaction_list)} interactions:**")
         # 1. Dataset bias
-        bias_predictor = self._calculate_dataset_bias(dataset=interaction_list)
+        test_statistic_bias, p_value_bias, bias_predictor = self.calculate_dataset_bias(dataset=interaction_list)
+        _ = self.evaluate_dataset_bias_test_result(test_statistic_bias=test_statistic_bias, p_value_bias=p_value_bias,
+                                                   do_print=True)
 
         # 2.a) Bias predictor metrics for whole dataset
-        self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=interaction_list,
-                                         name="Whole dataset")
+        _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=interaction_list,
+                                            name="Whole dataset", do_print=True)
 
         # 2.b) Bias predictor metrics for training dataset
         if len(train_interactions) > 0:
-            self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=train_interactions,
-                                             name="Training set only")
+            _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=train_interactions,
+                                                name="Training set only", do_print=True)
         # 2.c) Bias predictor metrics for validation dataset
         if len(val_interactions) > 0:
-            self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=val_interactions,
-                                             name="Validation set only")
+            _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=val_interactions,
+                                                name="Validation set only", do_print=True)
         # 2.d) Bias predictor metrics for test dataset
         if len(test_interactions) > 0:
-            self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=test_interactions,
-                                             name="Test set only")
+            _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=test_interactions,
+                                                name="Test set only", do_print=True)
         # 2.e) Bias predictor metrics for hub interactions
         protein_hub_interactions = self._check_protein_hubs(interactions=interaction_list)
         if len(protein_hub_interactions) > 0:
-            self._calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
-                                             name="Hub interactions only")
+            _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
+                                                name="Hub interactions only", do_print=True)
 
         # 3. Check sequence lengths
-        self._check_sequence_lengths(interactions=interaction_list, id2seq=id2seq)
+        (average_length_positive, average_length_negative, positive_sequence_lengths,
+         negative_sequence_lengths, test_statistic_length, p_value_length) = self.check_sequence_lengths(
+            interactions=interaction_list, id2seq=id2seq)
+        _ = self.evaluate_sequence_length_test_result(average_length_positive, average_length_negative,
+                                                      positive_sequence_lengths,
+                                                      negative_sequence_lengths, test_statistic_length, p_value_length,
+                                                      do_print=True)
