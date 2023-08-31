@@ -18,6 +18,13 @@ class DatasetMITAB25(DatasetHVI):
     For column descriptions, see https://psicquic.github.io/MITAB25Format.html
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return ("#ID(s) interactor A	ID(s) interactor B	Alt. ID(s) interactor A	Alt. ID(s) interactor B	Alias(es) "
+                "interactor A	Alias(es) interactor B	Interaction detection method(s)	Publication 1st author(s)	"
+                "Publication Identifier(s)	Taxid interactor A	Taxid interactor B	Interaction type(s)	Source "
+                "database(s)	Interaction identifier(s)	Confidence value(s)")
+
     delimiter = "\t"
     name = "mi_tab_25"
     header = None

@@ -39,6 +39,13 @@ class DatasetHVIDB(DatasetHVI):
         Virus_GeneID:               Gene ID associated with viral protein, e.g. 5176191 (searchable in Uniprot, might be NaN)
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return ("Uniprot_human	Uniprot_virus	EntryName_human	EntryName_virus	Organism_human	Organism_virus	"
+                "Organism_Interactor_human	Organism_Interactor_virus	Experimental_System	Pubmed_ID	"
+                "Interaction_Type	Source_Database	Complex_structure	Short	HDF	HRF	Viral_family	"
+                "Human_GeneName	Human_ProteinName	Human_GeneID	Virus_GeneName	Virus_ProteinName	Virus_GeneID")
+
     delimiter = "\t"
     name = "hvidb"
     header = "infer"

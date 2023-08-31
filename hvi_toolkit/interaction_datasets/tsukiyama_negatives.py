@@ -22,6 +22,10 @@ class DatasetTsukiyamaNegatives(DatasetHVI):
     virus_seq: viral sequence
     """
 
+    @staticmethod
+    def get_header() -> str:
+        return "human_pro,virus_pro,human_seq,virus_seq"
+
     delimiter = ","
     name = "tsukiyama_negatives"
     header = "infer"
@@ -31,7 +35,7 @@ class DatasetTsukiyamaNegatives(DatasetHVI):
 
         if file_path and (fasta_file is None):
             raise Exception(f"To construct tsukiyama_negatives dataset from file, an associated fasta file"
-                            f"containing the sequences must be given!")
+                            f"containing the taxa must be given!")
 
         # Remove everything that is not from uniprotkb
         self.data_frame = self.data_frame[self.data_frame["virus_pro"].str.contains("uniprot")]
