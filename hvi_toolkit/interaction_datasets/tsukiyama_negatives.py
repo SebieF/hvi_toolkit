@@ -33,9 +33,10 @@ class DatasetTsukiyamaNegatives(DatasetHVI):
     def __init__(self, file_path: str = None, data_frame: pd.DataFrame = None, fasta_file: str = None):
         super().__init__(file_path, data_frame)
 
-        if file_path and (fasta_file is None):
-            raise Exception(f"To construct tsukiyama_negatives dataset from file, an associated fasta file"
-                            f"containing the taxa must be given!")
+        # Not compatible with biocentral
+        # if file_path and (fasta_file is None):
+        #     raise Exception(f"To construct tsukiyama_negatives dataset from file, an associated fasta file"
+        #                     f"containing the taxa must be given!")
 
         # Remove everything that is not from uniprotkb
         self.data_frame = self.data_frame[self.data_frame["virus_pro"].str.contains("uniprot")]
@@ -44,6 +45,8 @@ class DatasetTsukiyamaNegatives(DatasetHVI):
             lambda protein_id: protein_id.split(":")[-1])  # Remove uniprotkb annotation
         if fasta_file:
             self.__assign_virus_taxa(fasta_file)
+        else:
+            self.data_frame["Taxon_virus"] = pd.Series([-1] * len(self.data_frame["virus_pro"]))
 
     def __assign_virus_taxa(self, fasta_file: str):
         """
