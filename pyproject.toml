@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "hvi-toolkit"
+version = "0.1.0"
+description = ""
+authors = ["Sebastian Franz <sebastian.franz@tum.de>"]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+pandas = "^2.1.1"
+seaborn = "^0.13.0"
+taxoniq = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
