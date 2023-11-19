@@ -17,25 +17,32 @@ class Taxonomy:
         'Rhabdoviridae'
     """
 
-    def get_name_from_id(self, taxonomy_id):
+    def get_name_from_id(self, taxonomy_id: int) -> str:
         """
         Returns the name of the species for a given taxonomy id.
 
 
         :param taxonomy_id: NCBI taxonomy id
-        :return: Raw name from names_taxonomy.tsv
+        :return: Scientific name of the given taxonomy id
         """
         taxon = taxoniq.Taxon(taxonomy_id)
         return taxon.scientific_name
 
-    def get_family_from_id(self, taxonomy_id) -> str:
+    def get_family_from_id(self, taxonomy_id: int) -> str:
         """
-        Returns the family name for the given taxonomy id
+        Returns the family name for the given taxonomy id.
+
+        "-aceae": fungal, algal, and botanical nomenclature
+        "-idae": animals, viruses
+
+        We need to iterate over the taxonomy tree for the given id to find the correct family name,
+        because hierarchies may differ in length
 
         :param taxonomy_id: NCBI taxonomy id
-        :return: Viral family closest to the given taxonomy id
+        :return: Family name for the given taxonomy id
         """
-
-        # Use cached result if possible
         taxon = taxoniq.Taxon(taxonomy_id)
-        return taxon.parent.parent.parent.scientific_name
+        for taxon in taxon.ranked_lineage:
+            if taxon.rank == taxoniq.Rank["family"]:
+                break
+        return taxon.scientific_name
