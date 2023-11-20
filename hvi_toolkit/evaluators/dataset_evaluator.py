@@ -232,22 +232,28 @@ class DatasetEvaluator:
         print(f"Least frequent: {minimum_category}")
         print(f"Chi-squared test: {test_statistic_chi2} (p-value: {p_value_chi2})")
 
-    def _check_protein_hubs(self, interactions: List[Interaction]):
+    def check_protein_hubs(self, interactions: List[Interaction], do_print: bool):
         """
         Check if the dataset contains hub proteins (and hence hub interactions). The threshold above which
         a protein is classified as a hub protein is defined by the constructor (Default: 5).
 
         :param interactions: List of interactions
+        :param do_print: True - print test results
         """
         protein_hub_interactions, _ = SplitsGenerator.get_protein_hubs(interactions=interactions,
                                                                        hub_threshold=self.hub_threshold)
-        print(f"\n**Protein Hubs:**")
+        information = ""
+        information += f"\n**Hub interactions:**\n"
         if len(protein_hub_interactions) == 0:
-            print(f"No protein hub interactions in dataset.")
+            information += f"No protein hub interactions in dataset.\n"
         else:
-            print(f"Number of hub interactions: {len(protein_hub_interactions)}")
+            information += f"Number of hub interactions: {len(protein_hub_interactions)}\n"
+        information += f"Hub Threshold: {self.hub_threshold}"
 
-        return protein_hub_interactions
+        if do_print:
+            print(information)
+
+        return protein_hub_interactions, information
 
     def evaluate_standardized_dataset(self, standardized_dataset: DatasetHVIStandardized,
                                       sequences_fasta_path: str = ""):
@@ -278,7 +284,7 @@ class DatasetEvaluator:
                                             name="Whole dataset", do_print=True)
 
         # 2.b) Bias predictor for hub interactions
-        protein_hub_interactions = self._check_protein_hubs(interactions=interaction_list)
+        protein_hub_interactions, _ = self.check_protein_hubs(interactions=interaction_list, do_print=True)
         if len(protein_hub_interactions) > 0:
             _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
                                                 name="Hub interactions only", do_print=True)
@@ -367,7 +373,7 @@ class DatasetEvaluator:
             _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=test_interactions,
                                                 name="Test set only", do_print=True)
         # 2.e) Bias predictor metrics for hub interactions
-        protein_hub_interactions = self._check_protein_hubs(interactions=interaction_list)
+        protein_hub_interactions, _ = self.check_protein_hubs(interactions=interaction_list, do_print=True)
         if len(protein_hub_interactions) > 0:
             _ = self.calculate_bias_predictions(bias_predictor=bias_predictor, test_dataset=protein_hub_interactions,
                                                 name="Hub interactions only", do_print=True)
