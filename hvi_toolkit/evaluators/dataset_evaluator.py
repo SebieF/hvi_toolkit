@@ -109,9 +109,9 @@ class DatasetEvaluator:
     def evaluate_dataset_bias_test_result(self, test_statistic_bias: float, p_value_bias: float, do_print: bool):
         success = test_statistic_bias > self.bias_threshold
         information = ""
-        information += f"\n**Dataset bias:**"
-        information += f"Correlation between negative and positive interactions: {test_statistic_bias} "
-        f"(p-value: {p_value_bias})"
+        information += f"\n**Dataset bias:**\n"
+        information += (f"Correlation between negative and positive interactions: {test_statistic_bias} "
+                        f"(p-value: {p_value_bias})\n")
         if not success:
             information += f"Your dataset bias is quite high. The bias means that the frequency "
             f"for proteins associated with \n"
@@ -121,8 +121,8 @@ class DatasetEvaluator:
             f"Alternatively, you need to re-consider the creation of your negative dataset and \n"
             f"account for the characteristics of your ppi network."
         else:
-            information += f"Your dataset bias is rather small. This indicates that your dataset represents the underlying "
-            f"ppi network well."
+            information += (f"Your dataset bias is rather small. This indicates that your dataset represents the "
+                            f"underlying ppi network well.")
         if do_print:
             print(information)
         return success, information
@@ -154,7 +154,7 @@ class DatasetEvaluator:
                                              targets=test_set_targets,
                                              df_name=name)
         if do_print:
-            print(f"\n**Bias baseline predictions for {name}:**")
+            print(f"\n**Bias baseline predictions for {name}:**\n")
             print(bias_metrics)
         return bias_metrics
 
@@ -194,9 +194,9 @@ class DatasetEvaluator:
                                              p_value_length, do_print: bool):
         success = p_value_length > self.significance
         information = ""
-        information += f"\n**Sequence lengths:**"
-        information += f"Average length positive: {average_length_positive} (# Positive: {len(positive_sequence_lengths)})"
-        information += f"Average length negative: {average_length_negative} (# Negative: {len(negative_sequence_lengths)})"
+        information += f"\n**Sequence lengths:**\n"
+        information += f"Average length positive: {average_length_positive} (# Positive: {len(positive_sequence_lengths)})\n"
+        information += f"Average length negative: {average_length_negative} (# Negative: {len(negative_sequence_lengths)})\n"
         if not success:
             information += f"The lengths of your positive and negative interactions differ significantly!\n"
             f"This might introduce bias to the model's predictions if it can infer "
