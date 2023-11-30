@@ -209,28 +209,35 @@ class DatasetEvaluator:
             print(information)
         return success, information
 
-    def _check_uniform_distribution(self, category_frequencies: Dict[str, int], name: str):
+    def _check_uniform_distribution(self, category_frequencies: Dict[str, int], name: str, do_print: bool):
         """
-        Checks if the frequencies given are uniformly distributed via Chi-Squared test.
+        Checks if the frequencies for the given category are uniformly distributed via Chi-Squared test.
 
         :param category_frequencies: Frequencies how often a key appears in the category
+        :param name: Name of the category
+        :param do_print: True - print test results
+
         :name: Name of the category
         """
 
         maximum_category = max(category_frequencies.items(), key=lambda k: k[1])
         minimum_category = min(category_frequencies.items(), key=lambda k: k[1])
         test_statistic_chi2, p_value_chi2 = chisquare(f_obs=list(category_frequencies.values()))
+        success = p_value_chi2 > self.significance
 
-        print(f"\n**Uniform distribution: {name}**")
-        if p_value_chi2 < self.significance:
-            print(f"{name} category is not uniformly distributed within your dataset. This might be a reason for "
-                  f"biased interactions!")
+        information = f"\n**Uniform distribution: {name}**\n"
+        if not success:
+            information += (f"{name} category is not uniformly distributed within your dataset.\n"
+                            f"This might be a reason for biased interactions!")
         else:
-            print(f"{name} category is uniformly distributed within your dataset. The dataset is, hence, balanced "
-                  f"in this regard.")
-        print(f"Most frequent: {maximum_category}")
-        print(f"Least frequent: {minimum_category}")
-        print(f"Chi-squared test: {test_statistic_chi2} (p-value: {p_value_chi2})")
+            information += (f"{name} category is uniformly distributed within your dataset.\n"
+                            f"The dataset is, hence, balanced in this regard.")
+        information += f"\n*Most frequent*: {maximum_category}\n"
+        information += f"\n*Least frequent*: {minimum_category}\n"
+        information += f"Chi-squared test: {test_statistic_chi2} (p-value: {p_value_chi2})\n"
+        if do_print:
+            print(information)
+        return success, test_statistic_chi2, p_value_chi2, information
 
     def check_protein_hubs(self, interactions: List[Interaction], do_print: bool):
         """
@@ -301,7 +308,7 @@ class DatasetEvaluator:
                 if viral_family not in viral_families.keys():
                     viral_families[viral_family] = 0
                 viral_families[viral_family] += 1
-        self._check_uniform_distribution(category_frequencies=viral_families, name="Viral families")
+        _ = self._check_uniform_distribution(category_frequencies=viral_families, name="Viral families", do_print=True)
 
         # 4. Sequence lengths
         if sequences_fasta_path != "":
