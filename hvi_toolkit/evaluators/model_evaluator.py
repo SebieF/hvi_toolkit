@@ -6,7 +6,7 @@ from .model_wrapper import ModelWrapper
 from biotrainer.utilities import seed_all
 from typing import List, Dict, Any, Tuple
 from .metrics_calculator import calculate_all_metrics
-from bio_embeddings.embed import ProtTransT5XLU50Embedder
+from biotrainer.embedders import OneHotEncodingEmbedder
 
 amino_acids = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
 interaction_operations = {
@@ -57,7 +57,7 @@ class ModelEvaluator:
         longer_sequences = [create_random_sequence(seq_len) for seq_len in longer_lengths]
         shorter_sequences = [create_random_sequence(seq_len) for seq_len in shorter_lengths]
 
-        embedder = ProtTransT5XLU50Embedder()
+        embedder = OneHotEncodingEmbedder()
         embeddings_longer = [[embedder.reduce_per_protein(embedding)] for embedding
                              in list(embedder.embed_many(longer_sequences))]
         embeddings_shorter = [[embedder.reduce_per_protein(embedding)] for embedding
