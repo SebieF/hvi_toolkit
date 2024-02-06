@@ -12,6 +12,7 @@ python = "^3.9"
 pandas = "^2.1.1"
 seaborn = "^0.13.0"
 taxoniq = "^0.6.0"
+more-itertools = "^10.2.0"
 
 [build-system]
 requires = ["poetry-core"]
