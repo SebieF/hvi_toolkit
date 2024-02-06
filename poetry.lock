@@ -388,6 +388,17 @@ pyparsing = ">=2.3.1"
 python-dateutil = ">=2.7"
 
 [[package]]
+name = "more-itertools"
+version = "10.2.0"
+description = "More routines for operating on iterables, beyond itertools"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "more-itertools-10.2.0.tar.gz", hash = "sha256:8fccb480c43d3e99a00087634c06dd02b0d50fbf088b380de5a41a015ec239e1"},
+    {file = "more_itertools-10.2.0-py3-none-any.whl", hash = "sha256:686b06abe565edfab151cb8fd385a05651e1fdf8f0a14191e4439283421f8684"},
+]
+
+[[package]]
 name = "ncbi-refseq-accession-db"
 version = "2023.11.4"
 description = "Taxoniq accession index for NCBI BLAST databases"
@@ -875,4 +886,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "8b8ec786d02bd66a109830a14d00c34fe7d33564ee7523c84b43b580757af4fd"
+content-hash = "09cdc28a0e068cc8cd275801be8e2145affd67ab9a06ec002f5d9795e028b54e"
