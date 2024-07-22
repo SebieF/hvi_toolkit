@@ -106,11 +106,7 @@ model checking works.
 The model was trained with the `biotrainer_config.yml` configuration file that can be run via:
 ```bash
 # Install biotrainer
-conda create --name biotrainer
-conda activate biotrainer
-git clone https://github.com/sacdallago/biotrainer.git
-cd biotrainer
-pip install .
+poetry add git+https://github.com/SebieF/biotrainer.git
 
 # Run configuration file
 cd lyssa_predict/model
