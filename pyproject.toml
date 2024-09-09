@@ -1,18 +1,21 @@
 [tool.poetry]
 name = "hvi-toolkit"
-version = "0.2.0"
-description = ""
+version = "0.2.1"
+description = "Tools to handle human-virus interaction datasets and models"
 authors = ["Sebastian Franz <sebastian.franz@tum.de>"]
 license = "MIT License"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.11.9"
+python = ">=3.11.9, <3.12"
 
 pandas = "^2.1.1"
 seaborn = "^0.13.0"
 taxoniq = "^1.0.1"
 more-itertools = "^10.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pip-audit = "^2.7.3"
 
 [build-system]
 requires = ["poetry-core"]
