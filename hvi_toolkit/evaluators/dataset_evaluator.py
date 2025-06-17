@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Tuple
 from scipy.stats import pearsonr, ttest_ind, chisquare
-from biotrainer.utilities import read_FASTA, get_attributes_from_seqrecords_for_protein_interactions, get_split_lists, \
-    INTERACTION_INDICATOR
+from biotrainer.input_files import read_FASTA, get_split_lists, merge_protein_interactions
+from biotrainer.utilities import INTERACTION_INDICATOR
 
 from hvi_toolkit.dataset_splitting import SplitsGenerator
 from hvi_toolkit.utilities import Interaction
@@ -31,9 +31,10 @@ class DatasetEvaluator:
     @staticmethod
     def convert_biotrainer_fasta_to_interaction_list(biotrainer_fasta_path: str):
         seq_records = read_FASTA(biotrainer_fasta_path)
-        id2seq = {seq.id: seq for seq in seq_records}
-        id2attributes = get_attributes_from_seqrecords_for_protein_interactions(seq_records)
-        train, val, test = tuple(map(set, get_split_lists(id2attributes)))
+        id2seq = {seq_record.seq_id: seq_record.seq for seq_record in seq_records}
+        id2attributes = {seq_record.seq_id: seq_record.attributes for seq_record in seq_records}
+        id2sets = {seq_record.seq_id: seq_record.get_set() for seq_record in seq_records}
+        train, val, test, _ = get_split_lists(id2sets)
 
         interaction_list = []
         for interaction_id, attrs in id2attributes.items():
@@ -49,7 +50,7 @@ class DatasetEvaluator:
         val_interactions = [interaction for interaction in interaction_list
                             if DatasetEvaluator._get_interaction_id(interaction) in val]
         test_interactions = [interaction for interaction in interaction_list
-                             if DatasetEvaluator._get_interaction_id(interaction) in test]
+                             if DatasetEvaluator._get_interaction_id(interaction) in test["test"]]
 
         return id2seq, interaction_list, train_interactions, val_interactions, test_interactions
 
@@ -313,7 +314,7 @@ class DatasetEvaluator:
         # 4. Sequence lengths
         if sequences_fasta_path != "":
             seq_records = read_FASTA(sequences_fasta_path)
-            id2seq = {seq.id: seq.seq for seq in seq_records}
+            id2seq = {seq_record.seq_id: seq_record.seq for seq_record in seq_records}
 
             # Check that all sequences have been provided
             missing_sequences = []
