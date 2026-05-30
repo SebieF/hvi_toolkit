@@ -1,7 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Union, Iterable, Dict, List, Any
 
-from biotrainer.inference import Inferencer
+from biotrainer.training.inference import Inferencer
 
 
 class ModelWrapper(ABC):

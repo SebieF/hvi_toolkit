@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Tuple
 from scipy.stats import pearsonr, ttest_ind, chisquare
-from biotrainer.input_files import read_FASTA, get_split_lists, merge_protein_interactions
-from biotrainer.utilities import INTERACTION_INDICATOR
+from biotrainer_core.input_files import read_FASTA, get_split_lists, merge_protein_interactions
+from biotrainer_core.utils.constants import INTERACTION_INDICATOR
 
 from hvi_toolkit.dataset_splitting import SplitsGenerator
 from hvi_toolkit.utilities import Interaction

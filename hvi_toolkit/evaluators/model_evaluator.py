@@ -3,10 +3,10 @@ import random
 import numpy as np
 
 from .model_wrapper import ModelWrapper
-from biotrainer.utilities import seed_all
+from biotrainer_core.functions.seeding import seed_all
 from typing import List, Dict, Any, Tuple
 from .metrics_calculator import calculate_all_metrics
-from biotrainer.embedders import OneHotEncodingEmbedder
+from biotrainer.embedding import OneHotEncodingEmbedder
 
 amino_acids = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
 interaction_operations = {
